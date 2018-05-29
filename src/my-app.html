@@ -22,11 +22,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
+<link rel="import" href="login-form.html">
 
 <link rel="lazy-import" href="my-view1.html">
 <link rel="lazy-import" href="my-view2.html">
 <link rel="lazy-import" href="my-view3.html">
 <link rel="lazy-import" href="my-view404.html">
+
+<link href="../bower_components/flag-icon-css/css/flag-icon.css" rel="stylesheet" type="text/css" crossorigin="anonymous">
 
 <dom-module id="my-app">
   <template>
@@ -94,6 +97,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         font-weight: bold;
       }
 
+      .drawer-list a:hover {
+        background-color: #352633;
+      }
+
       #drawer-menu:hover {
         background-color: #352633;
       }
@@ -112,7 +119,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" class="drawer-list-bg" hidden="[[!authenticated]]">
         <app-toolbar id="drawer-menu" class="toolbar-menu">
           <div>Tech U Col-Ed1</div>
-
+          <span class="flag-icon flag-icon-gr"></span>  
         </app-toolbar>
         <div class="menu-list">
           <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
@@ -143,6 +150,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <my-view404 name="view404"></my-view404>
           </iron-pages>
         </app-header-layout>
+
+      </template is="dom-if" if="[[!authenticated]]">
+          <login-form></login-form>
+      <template>
 
       </template>
 
@@ -178,12 +189,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           rootPath: String,
           authenticated: {
             type: Boolean,
-            value: true
+            value: true,
           },
           tittle: {
             type: String,
             value: 'Bienvenido',
-          } 
+          }
         };
       }
 
@@ -206,6 +217,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
         if (!this.$.drawer.persistent) {
+          console.log(this.$.drawer.persistent);
           this.$.drawer.close();
         }
 
@@ -228,12 +240,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _changeTittle(e){
         //console.log(e.target.innerText);
-        this.tittle = e.target.innerText;        
+        this.tittle = e.target.innerText;
       }
 
       _logOut(){
+        this.$.drawer.close();
         this.authenticated = false;
-      }  
+      }
 
     }
 
