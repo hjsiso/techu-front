@@ -10,32 +10,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="shared-styles.html">
+
+<link href="../bower_components/flag-icon-css/css/flag-icon.css" rel="stylesheet" type="text/css" crossorigin="anonymous">
 
 <dom-module id="login-form">
   <template>
-    <style include="shared-styles">
+    <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
 
         padding: 10px;
       }
 
-      .card {
-        width: 60%;
+      .card {}
+
+      paper-button.green {
+        background-color: var(--paper-green-500);
+        color: white;
+      }
+
+      .container {
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
       }
     </style>
 
     <div class="card">
+      <h5>Tech-U Partitioner Col Ed1
+        <span class="flag-icon flag-icon-co"></span>
+      </h5>
+      <h1>Sign In</h1>
+      <paper-input label="Email" type="email"></paper-input>
 
-      <h1>Login</h1>
-      <paper-input always-float-label label="Floating label"></paper-input>
-      <paper-input label="username">
-        <iron-icon icon="mail" slot="prefix"></iron-icon>
-        <div slot="suffix">@email.com</div>
-      </paper-input>
+      <br>
+      <div class="">
+        <div class="horizontal start-justified layout">
+          <div>Registrate</div>
+        </div>
+
+        <div class="horizontal end-justified layout">
+          <paper-button toggles raised class="green">Next</paper-button>
+        </div>
+      </div>
     </div>
   </template>
+
 
   <script>
     class LoginForm extends Polymer.Element {

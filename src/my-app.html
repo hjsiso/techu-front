@@ -36,7 +36,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <style>
       :host {
         --app-primary-color: #4d394b;
-        --app-secondary-color: #fff;
+        --app-secondary-color: #beb8be;
 
         --app-grid-columns: 3;
         /* 50% the width of the item is equivalent to 2:1 aspect ratio*/
@@ -94,7 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       .drawer-list a.iron-selected {
         color: #fff;
-        font-weight: bold;
+        background-color: #4c9689;
       }
 
       .drawer-list a:hover {
@@ -104,6 +104,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #drawer-menu:hover {
         background-color: #352633;
       }
+
+      .tittle-menu {
+        padding: 5px
+      }
     </style>
 
     <app-location route="{{route}}" url-space-regex="^[[rootPath]]">
@@ -112,27 +116,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}">
     </app-route>
 
+
     <app-drawer-layout fullbleed narrow="{{narrow}}">
       <!-- Drawer content -->
 
-
-      <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" class="drawer-list-bg" hidden="[[!authenticated]]">
-        <app-toolbar id="drawer-menu" class="toolbar-menu">
-          <div>Tech U Col-Ed1</div>
-          <span class="flag-icon flag-icon-gr"></span>  
-        </app-toolbar>
-        <div class="menu-list">
-          <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-            <a name="view1" href="[[rootPath]]view1" on-tap="_changeTittle">Cuentas</a>
-            <a name="view2" href="[[rootPath]]view2" on-tap="_changeTittle">Movimientos</a>
-            <a name="view3" href="[[rootPath]]view3" on-tap="_changeTittle">Usuario</a>
-            <a href="#" on-tap="_logOut">Logout</a>
-          </iron-selector>
-        </div>
-      </app-drawer>
-
-      <!-- Main content -->
       <template is="dom-if" if="[[authenticated]]">
+        <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]" class="drawer-list-bg">
+          <app-toolbar id="drawer-menu" class="toolbar-menu">
+            <div class="tittle-menu">Tech-U Col Ed1</div>
+            <span class="flag-icon flag-icon-co"></span>
+          </app-toolbar>
+          <div class="menu-list">
+            <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+              <a name="view1" href="[[rootPath]]view1" on-tap="_changeTittle">Cuentas</a>
+              <a name="view2" href="[[rootPath]]view2" on-tap="_changeTittle">Movimientos</a>
+              <a name="view3" href="[[rootPath]]view3" on-tap="_changeTittle">Usuario</a>
+              <a href="#" on-tap="_logOut">Logout</a>
+            </iron-selector>
+          </div>
+        </app-drawer>
+
+        <!-- Main content -->
         <app-header-layout has-scrolling-region>
 
           <app-header slot="header" condenses reveals effects="waterfall">
@@ -151,10 +155,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </iron-pages>
         </app-header-layout>
 
-      </template is="dom-if" if="[[!authenticated]]">
-          <login-form></login-form>
-      <template>
 
+      </template>
+
+      <template is="dom-if" if="[[!authenticated]]">
+        <login-form></login-form>
       </template>
 
     </app-drawer-layout>
@@ -189,7 +194,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           rootPath: String,
           authenticated: {
             type: Boolean,
-            value: true,
+            value: false,
           },
           tittle: {
             type: String,
@@ -210,17 +215,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.page = page || 'view1';
 
         // Close a non-persistent drawer when the page & route are changed.
-
-
-        if (!this.authenticated) {
-          this.$.drawer.close();
+        if (this.$.drawer != undefined) {
+          if (!this.$.drawer.persistent) {
+            this.$.drawer.close();
+          }
         }
-
-        if (!this.$.drawer.persistent) {
-          console.log(this.$.drawer.persistent);
-          this.$.drawer.close();
-        }
-
 
       }
 
@@ -238,13 +237,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.page = 'view404';
       }
 
-      _changeTittle(e){
+      _changeTittle(e) {
         //console.log(e.target.innerText);
         this.tittle = e.target.innerText;
       }
 
-      _logOut(){
-        this.$.drawer.close();
+      _logOut() {
+        //this.$.drawer.close();
         this.authenticated = false;
       }
 
