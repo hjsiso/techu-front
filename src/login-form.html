@@ -25,36 +25,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 10px;
       }
 
-      .card {}
+
 
       paper-button.green {
         background-color: var(--paper-green-500);
         color: white;
       }
-
-      .container {
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
-      }
     </style>
 
     <div class="card">
-      <h5>Tech-U Partitioner Col Ed1
-        <span class="flag-icon flag-icon-co"></span>
-      </h5>
-      <h1>Sign In</h1>
-      <paper-input label="Email" type="email"></paper-input>
+      <form is="iron-form" id="form" method="post">
+        <h5>Tech-U Partitioner Col Ed1
+          <span class="flag-icon flag-icon-co"></span>
+        </h5>
+        <h1>Sign In</h1>
 
-      <br>
-      <div class="">
-        <div class="horizontal start-justified layout">
-          <div>Registrate</div>
-        </div>
+        <template is="dom-if" if="[[!emailOK]]">
+          <paper-input id="user" name="user" label="email" type="email"></paper-input>
+        </template>
 
-        <div class="horizontal end-justified layout">
-          <paper-button toggles raised class="green">Next</paper-button>
+        <template is="dom-if" if="[[emailOK]]">
+          <div>[[email]]</div>
+          <paper-input label="Password" type="Password"></paper-input>
+        </template>
+
+        <br>
+        <div class="">
+          <div class="horizontal start-justified layout">
+            <div>Registrate</div>
+          </div>
+
+          <div class="horizontal end-justified layout">
+            <paper-button toggles raised class="green" on-tap="_checkEmail">Next</paper-button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   </template>
 
@@ -62,6 +67,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script>
     class LoginForm extends Polymer.Element {
       static get is() { return 'login-form'; }
+
+      static get properties() {
+        return {
+          email: {
+            type: String,
+            value: "",
+          },
+          emailOK: {
+            type: Boolean,
+            value: false,
+          },
+          subroute: Object,
+
+        };
+      }
+
+      _checkEmail(e) {
+        let user = this.$.user;
+        console.log(this.$.user);
+        setTimeout(() => {
+          this.email = user;
+          //this.emailOK = true;
+
+          console.log("emailOK");
+        }, 3000);
+      }
     }
 
     window.customElements.define(LoginForm.is, LoginForm);
