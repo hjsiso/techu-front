@@ -11,6 +11,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="shared-styles.html">
 
@@ -21,31 +24,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <style include="shared-styles iron-flex iron-flex-alignment">
       :host {
         display: block;
-
         padding: 10px;
       }
 
+      .card {
+        height: 350px
+      }
 
+      #toastErr {
+        --paper-toast-background-color: red;
+        --paper-toast-color: white;
+      }
 
       paper-button.green {
         background-color: var(--paper-green-500);
         color: white;
       }
     </style>
+    <iron-ajax id="getCheckEmail" method="POST" body='{{postBody}}' handle-as="json" content-type="application/json" on-response="_getCheckEmailSuccess"
+      on-error="_getCheckEmailError" url="http://127.0.0.1:3000/dev/v3/checkemail/">
+    </iron-ajax>
+    <paper-toast id="toastErr" class="fit-bottom" text="[[msgErr]]" verticalAlign="top"></paper-toast>
+    <div id="container" class="card">
 
-    <div class="card">
       <form is="iron-form" id="form" method="post">
         <h5>Tech-U Partitioner Col Ed1
           <span class="flag-icon flag-icon-co"></span>
         </h5>
-        <h1>Sign In</h1>
-
+        <h2>[[saludo]][[name]]</h2>
+        <paper-spinner active$=[[loading]]></paper-spinner>
         <template is="dom-if" if="[[!emailOK]]">
-          <paper-input id="user" name="user" label="email" type="email"></paper-input>
+          <paper-input label="email" type="email" value="{{email}}"></paper-input>
         </template>
 
         <template is="dom-if" if="[[emailOK]]">
-          <div>[[email]]</div>
           <paper-input label="Password" type="Password"></paper-input>
         </template>
 
@@ -56,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
 
           <div class="horizontal end-justified layout">
-            <paper-button toggles raised class="green" on-tap="_checkEmail">Next</paper-button>
+              <paper-button toggles raised class="green" on-tap="_checkEmail">Next</paper-button>
           </div>
         </div>
       </form>
@@ -70,7 +82,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       static get properties() {
         return {
+          msgErr: {
+            type: String,
+            value: "",
+          },
+          saludo: {
+            type: String,
+            value: "Sign In",
+          },
           email: {
+            type: String,
+            value: "",
+          },
+          name: {
             type: String,
             value: "",
           },
@@ -78,20 +102,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: Boolean,
             value: false,
           },
+          loading: {
+            type: Boolean,
+            value: false,
+          },
+          postBody: {
+            type: String,
+            computed: 'bodyCheckMail(email)'
+          },
           subroute: Object,
 
         };
       }
 
-      _checkEmail(e) {
-        let user = this.$.user;
-        console.log(this.$.user);
-        setTimeout(() => {
-          this.email = user;
-          //this.emailOK = true;
+      bodyCheckMail(email) {
+        return `{"email":"${email}"}`
+      }
 
-          console.log("emailOK");
-        }, 3000);
+      _getCheckEmailSuccess(e) {
+        this.emailOK = true;
+        this.name = ", " + e.detail.response.name;
+        this.saludo = "Bienvenido";
+        this.loading = false;
+      }
+
+      _getCheckEmailError(e) {
+        console.log(e)
+
+        this.email == "" ? this.msgErr = "Error en la consulta" : this.msgErr = "Usuario no encontrado";
+        this.$.toastErr.fitInto = container;
+        this.$.toastErr.open();
+        this.loading = false;
+      }
+
+      _checkEmail(e) {
+        this.loading = true;
+        console.log(this.postBody);
+        this.$.getCheckEmail.generateRequest();
+
       }
     }
 
