@@ -7,7 +7,6 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
@@ -44,21 +43,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-ajax id="getCheckEmail" method="POST" body='{{postBody}}' handle-as="json" content-type="application/json" on-response="_getCheckEmailSuccess"
       on-error="_getCheckEmailError" url="http://127.0.0.1:3000/dev/v3/checkemail/">
     </iron-ajax>
+    <iron-ajax id="getCheckLogin" method="POST" body='{{postBody}}' handle-as="json" content-type="application/json" on-response="_getCheckLoginSuccess"
+      on-error="_getCheckLoginError" url="http://127.0.0.1:3000/dev/v3/login/">
+    </iron-ajax>
     <paper-toast id="toastErr" class="fit-bottom" text="[[msgErr]]" verticalAlign="top"></paper-toast>
     <div id="container" class="card">
 
       <form is="iron-form" id="form" method="post">
-        <h5>Tech-U Partitioner Col Ed1
+        <h5>Tech-U Practitioner Col Ed1
           <span class="flag-icon flag-icon-co"></span>
         </h5>
         <h2>[[saludo]][[name]]</h2>
         <paper-spinner active$=[[loading]]></paper-spinner>
         <template is="dom-if" if="[[!emailOK]]">
-          <paper-input label="email" type="email" value="{{email}}"></paper-input>
+          <paper-input label="Email" type="email" value="{{email}}"></paper-input>
         </template>
 
         <template is="dom-if" if="[[emailOK]]">
-          <paper-input label="Password" type="Password"></paper-input>
+          <paper-input label="Password" type="password" value="{{password}}"></paper-input>
         </template>
 
         <br>
@@ -94,6 +96,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             value: "",
           },
+          password: {
+            type: String,
+            value: "",
+          },
           name: {
             type: String,
             value: "",
@@ -108,37 +114,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           },
           postBody: {
             type: String,
-            computed: 'bodyCheckMail(email)'
+            computed: 'bodyCheck(emailOK, email, password)'
           },
           subroute: Object,
 
         };
       }
 
-      bodyCheckMail(email) {
-        return `{"email":"${email}"}`
+      bodyCheck(emailOK, email, password) {
+        return emailOK ? `{"email":"${email}", "password":"${password}"}` : `{"email":"${email}"}`
       }
 
       _getCheckEmailSuccess(e) {
         this.emailOK = true;
-        this.name = ", " + e.detail.response.name;
-        this.saludo = "Bienvenido";
+        this.name = e.detail.response.name;
+        this.saludo = "Bienvenido!! ";
         this.loading = false;
+      }
+
+      _getCheckLoginError() {
+        this.password == "" ? this.msgErr = "Error en la consulta" : this.msgErr = "Error al validar sus datos de acecso";
+        this.$.toastErr.fitInto = this.$.container;
+        this.$.toastErr.open();
+        this.loading = false;
+      }
+
+      _getCheckLoginSuccess(e) {
+        console.log(e);
+        if(e.type === "error"){
+          _getCheckLoginError();
+        }else{
+          this.authenticated = true;
+          this.loading = false;
+          this.emailOK = false;
+          this.email = "";
+          this.password = "";
+          this.saludo = "Sign In";
+          this.name = "";
+          this.dispatchEvent(new CustomEvent('logged-ok', { detail: { logged: true } }));
+        }
+
       }
 
       _getCheckEmailError(e) {
         console.log(e)
-
         this.email == "" ? this.msgErr = "Error en la consulta" : this.msgErr = "Usuario no encontrado";
-        this.$.toastErr.fitInto = container;
+        this.$.toastErr.fitInto = this.$.container;
         this.$.toastErr.open();
         this.loading = false;
       }
 
       _checkEmail(e) {
+
         this.loading = true;
-        console.log(this.postBody);
-        this.$.getCheckEmail.generateRequest();
+        if(this.emailOK){
+          console.log(this.postBody);
+          this.$.getCheckLogin.generateRequest();
+        } else {
+          console.log(this.postBody);
+          this.$.getCheckEmail.generateRequest();
+        }
 
       }
     }

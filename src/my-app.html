@@ -155,11 +155,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </iron-pages>
         </app-header-layout>
 
-
       </template>
 
       <template is="dom-if" if="[[!authenticated]]">
-        <login-form></login-form>
+        <login-form on-logged-ok="_userLogged" email="" email-ok="false"></login-form>
       </template>
 
     </app-drawer-layout>
@@ -242,7 +241,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.tittle = e.target.innerText;
       }
 
-      _logOut() {
+      _userLogged(e){
+        console.log(e);
+        this.authenticated = true;
+      }
+
+      _logOut(e) {
         //this.$.drawer.close();
         this.authenticated = false;
       }
